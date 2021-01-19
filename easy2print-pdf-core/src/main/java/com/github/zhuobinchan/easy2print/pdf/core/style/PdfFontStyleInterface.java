@@ -10,17 +10,20 @@ import com.itextpdf.kernel.font.PdfFont;
 public interface PdfFontStyleInterface {
 
     /**
+     * @param model 模型内容
      * @return 字体样式
      */
     PdfFont getPdfFont(PdfModel model);
 
 
     /**
+     * @param model 模型内容
      * @return 字体大小
      */
     float fontSize(PdfModel model);
 
     /**
+     * @param model 模型内容
      * 字体颜色
      */
     Color fontColor(PdfModel model);
