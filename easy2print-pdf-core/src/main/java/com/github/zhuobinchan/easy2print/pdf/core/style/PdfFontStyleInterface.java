@@ -24,7 +24,7 @@ public interface PdfFontStyleInterface {
 
     /**
      * @param model 模型内容
-     * 字体颜色
+     * @return 字体颜色
      */
     Color fontColor(PdfModel model);
 }
