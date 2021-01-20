@@ -30,7 +30,7 @@ public class PdfModelUtils {
     /**
      * 列表通配符配置
      */
-    public final static String PLACEHOLDER_STRING = "{COLLECTION_INDEX}";
+    public final static String PLACEHOLDER_STRING = "${COLLECTION_INDEX}";
 
     /**
      * 填充pdf文件

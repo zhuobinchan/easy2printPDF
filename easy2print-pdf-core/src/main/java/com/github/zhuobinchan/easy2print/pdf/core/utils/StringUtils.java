@@ -18,7 +18,7 @@ public class StringUtils {
             return text;
         }
 
-        return text.replaceAll(searchString, replacement);
+        return text.replace(searchString, replacement);
     }
 
     public static boolean isEmpty(String cs) {
