@@ -2,10 +2,12 @@ package com.github.zhuobinchan.easy2print.pdf.core;
 
 import com.github.zhuobinchan.easy2print.pdf.core.annotiation.PdfField;
 import com.github.zhuobinchan.easy2print.pdf.core.annotiation.PdfFieldStyle;
-import com.github.zhuobinchan.easy2print.pdf.core.converter.PdfConverterInstance;
+import com.github.zhuobinchan.easy2print.pdf.core.converter.PdfConverterStrategy;
+import com.github.zhuobinchan.easy2print.pdf.core.converter.PdfConverterStrategyFactory;
 import com.github.zhuobinchan.easy2print.pdf.core.model.PdfModel;
-import com.github.zhuobinchan.easy2print.pdf.core.style.PdfFieldStyleInstance;
 import com.github.zhuobinchan.easy2print.pdf.core.style.PdfFontStyleInterface;
+import com.github.zhuobinchan.easy2print.pdf.core.style.strategy.PdfFieldStyleStrategy;
+import com.github.zhuobinchan.easy2print.pdf.core.style.strategy.PdfFieldStyleStrategyFactory;
 import com.github.zhuobinchan.easy2print.pdf.core.utils.StringUtils;
 import com.itextpdf.forms.PdfAcroForm;
 import com.itextpdf.forms.fields.PdfFormField;
@@ -52,15 +54,28 @@ public class PdfModelUtils {
      * @return 返回目标文件路劲
      */
     public static String printPdf(String sourcePath, String descRootDir, Object model, Class<?> modelClazz) {
+        return printPdf(sourcePath, descRootDir, model, modelClazz, PdfConverterStrategyFactory.instanceDefaultStrategy(), PdfFieldStyleStrategyFactory.instanceDefaultStrategy());
+    }
+
+    /**
+     * 填充pdf文件
+     *
+     * @param sourcePath        源的pdf文件模板
+     * @param descRootDir       目标文件目录
+     * @param model             数据模板
+     * @param modelClazz        模板类读取
+     * @param converterStrategy 获取converter策略
+     * @param styleStrategy     获取样式策略
+     * @return 返回目标文件路劲
+     */
+    public static String printPdf(String sourcePath, String descRootDir, Object model, Class<?> modelClazz, PdfConverterStrategy converterStrategy, PdfFieldStyleStrategy styleStrategy) {
         try {
-            List<PdfModelWithStyle> pdfModelList = toPdfModel(model, modelClazz);
+            List<PdfModelWithStyle> pdfModelList = toPdfModel(model, modelClazz, converterStrategy, styleStrategy);
             String desPath = descRootDir + "/" + UUID.randomUUID().toString() + ".pdf";
             printPdfToFile(sourcePath, desPath, pdfModelList);
             return desPath;
         } catch (IOException | IllegalAccessException e) {
             throw new RuntimeException(e);
-        } finally {
-            PdfFieldStyleInstance.getInstance().removeCache();
         }
     }
 
@@ -91,15 +106,16 @@ public class PdfModelUtils {
     /**
      * 转换为转换载体的内部类
      *
-     * @param model      源的model文件
-     * @param modelClazz 模板class
+     * @param model             源的model文件
+     * @param modelClazz        模板class
+     * @param converterStrategy 获取converter策略
+     * @param styleStrategy     获取样式策略
      * @return 转换载体内部类
      * @throws IllegalAccessException 字段不合法异常
      */
-    public static List<PdfModelWithStyle> toPdfModel(Object model, Class<?> modelClazz) throws IllegalAccessException {
+    public static List<PdfModelWithStyle> toPdfModel(Object model, Class<?> modelClazz, PdfConverterStrategy converterStrategy, PdfFieldStyleStrategy styleStrategy) throws IllegalAccessException {
         Field[] fields = modelClazz.getDeclaredFields();
         List<PdfModelWithStyle> resultList = new ArrayList<>();
-        PdfConverterInstance pdfConverterInstance = PdfConverterInstance.INSTANCE;
         for (Field field : fields) {
             PdfField pdfField = field.getAnnotation(PdfField.class);
             if (pdfField == null) {
@@ -116,7 +132,7 @@ public class PdfModelUtils {
                 Collection collection = (Collection) fieldValue;
                 if (!collection.isEmpty()) {
                     for (Object collectionItem : collection) {
-                        List<PdfModelWithStyle> collectionResultList = toPdfModel(collectionItem, collectionItem.getClass());
+                        List<PdfModelWithStyle> collectionResultList = toPdfModel(collectionItem, collectionItem.getClass(), converterStrategy, styleStrategy);
 
                         int index = pdfField.collectionStartIndex();
                         for (PdfModelWithStyle collectionResultItem : collectionResultList) {
@@ -137,9 +153,11 @@ public class PdfModelUtils {
 
             PdfModelWithStyle pdfModel = new PdfModelWithStyle();
             pdfModel.setFieldName(fieldName);
-            String finalFieldValue = pdfField.fieldValuePrefix() + pdfConverterInstance.converter(pdfField.converter(), fieldValue) + pdfField.fieldValueSuffix();
+
+            Class converter = pdfField.converter();
+            String finalFieldValue = pdfField.fieldValuePrefix() + converterStrategy.getConverter(converter).convertToPdfData(fieldValue) + pdfField.fieldValueSuffix();
             pdfModel.setFieldValue(finalFieldValue);
-            pdfModel.setFieldStyle(getFieldStyleByModelField(field));
+            pdfModel.setFieldStyle(getFieldStyleByModelField(field, styleStrategy));
             resultList.add(pdfModel);
         }
         return resultList;
@@ -151,12 +169,12 @@ public class PdfModelUtils {
      * @param field 当前字段
      * @return 返回该字段样式
      */
-    private static PdfFontStyleInterface getFieldStyleByModelField(Field field) {
+    private static PdfFontStyleInterface getFieldStyleByModelField(Field field, PdfFieldStyleStrategy pdfFieldStyleStrategy) {
         PdfFieldStyle pdfFieldStyle = field.getAnnotation(PdfFieldStyle.class);
         if (pdfFieldStyle == null) {
             return null;
         }
-        return PdfFieldStyleInstance.getInstance().getPdfStyleInterface(pdfFieldStyle.fontStyle());
+        return pdfFieldStyleStrategy.getPdfStyleInterface(pdfFieldStyle.fontStyle());
     }
 
     /**
