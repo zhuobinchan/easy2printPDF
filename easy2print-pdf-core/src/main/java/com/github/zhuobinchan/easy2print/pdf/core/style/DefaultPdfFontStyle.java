@@ -1,7 +1,6 @@
 package com.github.zhuobinchan.easy2print.pdf.core.style;
 
 import com.github.zhuobinchan.easy2print.pdf.core.model.PdfModel;
-import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
