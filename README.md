@@ -2,6 +2,13 @@
 使用模板的方式 写属于你的pdf
 
 依赖 itext 框架 封装了一层 模板层，可以很方便的填充pdf
+```xml
+<dependency>
+  <groupId>com.github.zhuobinchan</groupId>
+  <artifactId>easy2print-pdf-core</artifactId>
+  <version>1.0</version>
+</dependency>
+```
 
 测试类，夏宫东西放在项目的test，resource文件下
 ```java
