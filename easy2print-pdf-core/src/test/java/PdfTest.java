@@ -3,6 +3,7 @@ import com.github.zhuobinchan.easy2print.pdf.core.annotiation.PdfField;
 import com.github.zhuobinchan.easy2print.pdf.core.annotiation.PdfFieldStyle;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,8 @@ public class PdfTest {
         invoiceCodeServiceParam.setServiceName("setServiceName1");
         objects.add(invoiceCodeServiceParam);
         model.setParams(objects);
-        System.out.println(PdfModelUtils.printPdf("https://statics.xinshuibao1.com/7124eb8105c3d7de930d.pdf", "C:\\Users\\xinbao\\Desktop\\", model, InvoiceCodePdfModel.class));
+
+        System.out.println(PdfModelUtils.printPdf("D:\\idea_project\\easy2printPDF\\easy2printPDF\\easy2print-pdf-core\\src\\test\\resources\\model\\7124eb8105c3d7de930d.pdf", "D:\\idea_project\\easy2printPDF\\easy2printPDF\\easy2print-pdf-core\\src\\test\\resources\\pdf\\", model, InvoiceCodePdfModel.class));
     }
 
 
