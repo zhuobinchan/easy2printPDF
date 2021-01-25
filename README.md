@@ -1,7 +1,26 @@
 # easy2printPDF
 使用模板的方式 写属于你的pdf
 
-依赖 itext 框架 封装了一层 模板层，可以很方便的填充pdf
+itext7 中文文档 https://github.com/iTextCN/itext7-in-mandarin
+
+TODO LIST
+
+| 功能         | 完成度       |
+| ------------ | ------------ |
+| 表单填充     | done         |
+| 图片填充     | will do      |
+| 列表动态填充 | will rebuild |
+
+
+
+1、
+对pdf整理表单格式,如下图
+![avatar](doc/20210125095004.png)
+
+
+
+
+2、依赖 itext 框架 封装了一层 模板层，可以很方便的填充pdf
 ```xml
 <dependency>
   <groupId>com.github.zhuobinchan</groupId>
@@ -10,7 +29,7 @@
 </dependency>
 ```
 
-测试类，夏宫东西放在项目的test，resource文件下
+3、测试类，夏宫东西放在项目的test，resource文件下
 ```java
 public class PdfTest {
     @Test
