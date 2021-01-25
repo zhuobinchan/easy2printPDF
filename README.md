@@ -29,7 +29,7 @@ TODO LIST
 </dependency>
 ```
 
-3、测试类，夏宫东西放在项目的test，resource文件下
+3、测试类，相关东西放在项目的test，resource文件下
 ```java
 public class PdfTest {
     @Test
