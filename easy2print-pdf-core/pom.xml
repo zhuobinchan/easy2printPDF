@@ -128,6 +128,7 @@
             </plugin>
             <!--  必须配置GPG插件用于使用以下配置对组件进行签名 -->
             <!-- GPG -->
+            <!-- mvn clean deploy -DskipTests=true -s "D:\Program Files\apache-maven-3.6.3-bin\apache-maven-3.6.3\conf\settings-deploy-my-repo.xml" -->
             <!-- <plugin>
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-gpg-plugin</artifactId>
