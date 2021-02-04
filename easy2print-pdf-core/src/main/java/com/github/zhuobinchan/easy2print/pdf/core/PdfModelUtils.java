@@ -10,14 +10,19 @@ import com.github.zhuobinchan.easy2print.pdf.core.style.strategy.PdfFieldStyleSt
 import com.github.zhuobinchan.easy2print.pdf.core.style.strategy.PdfFieldStyleStrategyFactory;
 import com.github.zhuobinchan.easy2print.pdf.core.utils.StringUtils;
 import com.itextpdf.forms.PdfAcroForm;
+import com.itextpdf.forms.fields.PdfButtonFormField;
 import com.itextpdf.forms.fields.PdfFormField;
+import com.itextpdf.io.codec.Base64;
+import com.itextpdf.io.util.UrlUtil;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -90,16 +95,40 @@ public class PdfModelUtils {
     private static void printPdfToFile(String sourcePath, String desPath, List<PdfModelWithStyle> pdfModelList) throws IOException {
         try (PdfReader reader = new PdfReader(sourcePath); PdfWriter writer = new PdfWriter(desPath); PdfDocument pdfDoc = new PdfDocument(reader, writer); Document doc = new Document(pdfDoc)) {
             PdfAcroForm form = PdfAcroForm.getAcroForm(pdfDoc, true);
-            pdfModelList.forEach(model -> {
+            for (PdfModelWithStyle model : pdfModelList) {
                 PdfFormField field = form.getField(model.getFieldName());
                 if (field != null) {
-                    if (model.getFieldStyle() == null) {
-                        field.setValue(model.getFieldValue());
-                    } else {
-                        field.setValue(model.getFieldValue(), model.getFieldStyle().getPdfFont(model), model.getFieldStyle().fontSize(model)).setColor(model.getFieldStyle().fontColor(model));
+                    Object fieldValue = model.getFieldValue();
+                    //图片处理
+                    if (fieldValue instanceof URL && field instanceof PdfButtonFormField) {
+                        field.setValue(Base64.encodeBytes(readImageType((URL) fieldValue)));
+                        ((PdfButtonFormField) field).setImage(((URL) fieldValue).getPath());
+//                        PdfImageButtonFormField pdfImageButtonFormField = new PdfImageButtonFormField( form.getPdfObject());
+//                        pdfImageButtonFormField.setImage(ImageDataFactory.create((URL) fieldValue));
+//                        form.replaceField(model.getFieldName(), pdfImageButtonFormField);
                     }
+
+                    //文本处理
+                    if (fieldValue instanceof String) {
+                        if (model.getFieldStyle() == null) {
+                            field.setValue(fieldValue.toString());
+                        } else {
+                            field.setValue(fieldValue.toString(), model.getFieldStyle().getPdfFont(model), model.getFieldStyle().fontSize(model)).setColor(model.getFieldStyle().fontColor(model));
+                        }
+                    }
+
                 }
-            });
+            }
+        }
+    }
+
+    private static byte[] readImageType(URL source) {
+        try (InputStream stream = UrlUtil.openStream(source)) {
+            byte[] bytes = new byte[8];
+            stream.read(bytes);
+            return bytes;
+        } catch (java.io.IOException e) {
+            throw new com.itextpdf.io.IOException(com.itextpdf.io.IOException.IoException, e);
         }
     }
 
@@ -155,7 +184,7 @@ public class PdfModelUtils {
             pdfModel.setFieldName(fieldName);
 
             Class converter = pdfField.converter();
-            String finalFieldValue = pdfField.fieldValuePrefix() + converterStrategy.getConverter(converter).convertToPdfData(fieldValue) + pdfField.fieldValueSuffix();
+            Object finalFieldValue = converterStrategy.getConverter(converter).convertToPdfData(fieldValue);
             pdfModel.setFieldValue(finalFieldValue);
             pdfModel.setFieldStyle(getFieldStyleByModelField(field, styleStrategy));
             resultList.add(pdfModel);
@@ -207,5 +236,6 @@ public class PdfModelUtils {
             this.fieldStyle = fieldStyle;
         }
     }
+
 
 }

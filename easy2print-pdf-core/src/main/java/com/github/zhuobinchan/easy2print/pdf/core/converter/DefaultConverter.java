@@ -7,10 +7,10 @@ import com.github.zhuobinchan.easy2print.pdf.core.utils.StringUtils;
  */
 public class DefaultConverter implements PdfFieldConverter<Object> {
     @Override
-    public String convertToPdfData(Object o) {
+    public Object convertToPdfData(Object o) {
         if (o == null) {
             return StringUtils.EMPTY;
         }
-        return o.toString();
+        return o;
     }
 }

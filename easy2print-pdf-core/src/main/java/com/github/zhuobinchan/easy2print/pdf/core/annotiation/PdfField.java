@@ -26,16 +26,6 @@ public @interface PdfField {
     String fieldName() default "";
 
     /**
-     * @return 结果前缀处理
-     */
-    String fieldValuePrefix() default "";
-
-    /**
-     * @return 结果后缀处理
-     */
-    String fieldValueSuffix() default "";
-
-    /**
      * @return 数组前缀是否忽略
      */
     boolean ignoreFieldNamePrefix4Collection() default false;

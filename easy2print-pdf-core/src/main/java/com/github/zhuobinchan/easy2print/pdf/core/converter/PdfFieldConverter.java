@@ -5,6 +5,6 @@ package com.github.zhuobinchan.easy2print.pdf.core.converter;
  */
 public interface PdfFieldConverter<INPUT> {
 
-    String convertToPdfData(INPUT input);
+    Object convertToPdfData(INPUT input);
 }
 

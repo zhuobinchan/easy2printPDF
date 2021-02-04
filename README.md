@@ -8,7 +8,7 @@ TODO LIST
 | 功能         | 完成度       |
 | ------------ | ------------ |
 | 表单填充     | done         |
-| 图片填充     | will do      |
+| 图片填充     | 本地图片路径已经支持,网络图片需要或者字节流图片暂时无法支持      |
 | 列表动态填充 | will rebuild |
 
 
@@ -25,7 +25,7 @@ TODO LIST
 <dependency>
   <groupId>com.github.zhuobinchan</groupId>
   <artifactId>easy2print-pdf-core</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
 </dependency>
 ```
 
@@ -33,71 +33,47 @@ TODO LIST
 ```java
 public class PdfTest {
     @Test
-    public void test2() {
-        InvoiceCodePdfModel model = new InvoiceCodePdfModel();
-        model.setCode_1("123");
-        model.setMachineNumber("abc哈哈");
-
-        ArrayList<InvoiceCodeServiceParam> objects = new ArrayList();
-        InvoiceCodeServiceParam invoiceCodeServiceParam = new InvoiceCodeServiceParam();
-        invoiceCodeServiceParam.setServiceName("setServiceName1");
-        objects.add(invoiceCodeServiceParam);
-        model.setParams(objects);
-
-        System.out.println(PdfModelUtils.printPdf("D:\\idea_project\\easy2printPDF\\easy2printPDF\\easy2print-pdf-core\\src\\test\\resources\\model\\7124eb8105c3d7de930d.pdf", "D:\\idea_project\\easy2printPDF\\easy2printPDF\\easy2print-pdf-core\\src\\test\\resources\\pdf\\", model, InvoiceCodePdfModel.class));
-    }
-
-
-    public static class InvoiceCodePdfModel {
-        @PdfField(fieldName = "code_1")
-        @PdfFieldStyle
-        private String code_1; // 发票左上角代码
-
-        @PdfField(fieldName = "machineNumber")
-        @PdfFieldStyle
-        private String machineNumber; // 机器编号
-
-        @PdfField(fieldName = "params", ignoreFieldNamePrefix4Collection = true)
-        private List<InvoiceCodeServiceParam> params;
-
-        public String getCode_1() {
-            return code_1;
+        public void test2() {
+            InvoiceCodePdfModel model = new InvoiceCodePdfModel();
+            model.setCode_1("123");
+            model.setMachineNumber("abc哈哈");
+    
+            ArrayList<InvoiceCodeServiceParam> objects = new ArrayList();
+            InvoiceCodeServiceParam invoiceCodeServiceParam = new InvoiceCodeServiceParam();
+            invoiceCodeServiceParam.setServiceName("setServiceName1");
+            objects.add(invoiceCodeServiceParam);
+            model.setParams(objects);
+    
+    //        model.setImage1("https://raw.githubusercontent.com/alibaba/easyexcel/master/src/test/resources/converter/img.jpg");
+            model.setImage1("D:\\idea_project\\easy2printPDF\\easy2printPDF\\easy2print-pdf-core\\src\\test\\resources\\model\\image.gif");
+    
+            System.out.println(PdfModelUtils.printPdf("D:\\idea_project\\easy2printPDF\\easy2printPDF\\easy2print-pdf-core\\src\\test\\resources\\model\\7124eb8105c3d7de930d.pdf", "D:\\idea_project\\easy2printPDF\\easy2printPDF\\easy2print-pdf-core\\src\\test\\resources\\pdf\\", model, InvoiceCodePdfModel.class));
         }
-
-        public void setCode_1(String code_1) {
-            this.code_1 = code_1;
+    
+    
+        public static class InvoiceCodePdfModel {
+            @PdfField(fieldName = "code_1")
+            @PdfFieldStyle
+            private String code_1; // 发票左上角代码
+    
+            @PdfField(fieldName = "machineNumber")
+            @PdfFieldStyle
+            private String machineNumber; // 机器编号
+    
+            @PdfField(fieldName = "params", ignoreFieldNamePrefix4Collection = true)
+            private List<InvoiceCodeServiceParam> params;
+    
+            //图片填充
+            @PdfField(fieldName = "image1", converter = ImagePathConverter.class)
+            private String image1;
+            //get set...
         }
-
-        public String getMachineNumber() {
-            return machineNumber;
+    
+        public static class InvoiceCodeServiceParam {
+            @PdfField(fieldName = "serviceName_${COLLECTION_INDEX}")
+            private String serviceName;
+            //get set...
         }
-
-        public void setMachineNumber(String machineNumber) {
-            this.machineNumber = machineNumber;
-        }
-
-        public List<InvoiceCodeServiceParam> getParams() {
-            return params;
-        }
-
-        public void setParams(List<InvoiceCodeServiceParam> params) {
-            this.params = params;
-        }
-    }
-
-    public static class InvoiceCodeServiceParam {
-        // ${COLLECTION_INDEX} 为在数组时的通配符
-        @PdfField(fieldName = "serviceName_${COLLECTION_INDEX}")
-        private String serviceName;
-
-        public String getServiceName() {
-            return serviceName;
-        }
-
-        public void setServiceName(String serviceName) {
-            this.serviceName = serviceName;
-        }
-    }
 }
 ```
 
